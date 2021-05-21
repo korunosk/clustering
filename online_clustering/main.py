@@ -3,7 +3,6 @@ import numpy as np
 from operator import itemgetter
 from sklearn.metrics import adjusted_rand_score
 
-
 from modules.clustering import Article, Clusters
 
 
@@ -56,31 +55,31 @@ data = list(zip(data1, data2, data3))
 mapping = { v: k for k, v in enumerate(set(labels_true)) }
 labels_true = itemgetter(*labels_true)(mapping)
 
-s = 0.1
+step = 0.1
 
 import time
 
-for c in np.arange(0, 1 + s, s):
-    for b in np.arange(0, 1 + s, s):
-        for a in np.arange(0, 1 + s, s):
+for c in np.arange(0, 1 + step, step):
+    for b in np.arange(0, 1 + step, step):
+        for a in np.arange(0, 1 + step, step):
             if (a + b + c) != 1:
                 continue
 
-            for thr in np.arange(0, 1 + s, s):
-                s = time.time()
+            for thr in np.arange(0, 1 + step, step):
+                st = time.time()
 
                 config = dict(a=a, b=b, c=c, thr=thr)
 
                 e = Executor(config)
 
-                for aid, a in enumerate(data):
-                    print(f'{aid + 1} / {len(data)} c={e.clusters.num_clusters()}', end='\r')
-                    e.new_article(aid, a)
+                for article_id, article_dict in enumerate(data):
+                    print(f'{article_id + 1} / {len(data)} c={e.clusters.num_clusters()}', end='\r')
+                    e.new_article(article_id, article_dict)
                 
-                score = adjusted_rand_score(labels_true, e.get_labels())
-                et = time.time() - s
+                score = adjusted_rand_score(labels_true, e.clusters.get_labels())
+                et = time.time() - st
 
                 print(f'config=(a={a:.2f} b={b:.2f} c={c:.2f} thr={thr:.2f}) score={score:.4f} #clusters={e.clusters.num_clusters()} et={et:.4f}')
 
-                with open(f'res2/a={a:.2f} b={b:.2f} c={c:.2f} thr={thr:.2f}.json', mode='w') as fp:
+                with open(f'data/res/a={a:.2f} b={b:.2f} c={c:.2f} thr={thr:.2f}.json', mode='w') as fp:
                     json.dump(e.clusters.get_labels(), fp, indent=4)
