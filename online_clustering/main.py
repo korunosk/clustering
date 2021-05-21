@@ -31,7 +31,7 @@ class Executor:
         A = Article(article_dict)
 
         if self.clusters.num_clusters() == 0:
-            cluster_id = self.clusters.num_clusters() - 1
+            cluster_id = 0
             self.clusters.resize_verticaly()
             self.clusters.add_article(cluster_id, article_id, A)
             return
@@ -44,7 +44,6 @@ class Executor:
             cluster_id = self.clusters.num_clusters() - 1
             self.clusters.resize_verticaly()
             self.clusters.add_article(cluster_id, article_id, A)
-
         else:
             cluster_id = np.argmin(d)
             self.clusters.add_article(cluster_id, article_id, A)
