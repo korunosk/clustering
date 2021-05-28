@@ -6,13 +6,13 @@ from sklearn.metrics import adjusted_rand_score
 from modules.clustering import Article, Clusters
 
 
-with open('data/data1.json', mode='r') as fp:
+with open('data/entities_title.json', mode='r') as fp:
     data1 = json.load(fp)
 
-with open('data/data2.json', mode='r') as fp:
+with open('data/keyphrases_title.json', mode='r') as fp:
     data2 = json.load(fp)
 
-with open('data/data3.json', mode='r') as fp:
+with open('data/keyphrases_text.json', mode='r') as fp:
     data3 = json.load(fp)
 
 with open('data/labels_true.json', mode='r') as fp:
