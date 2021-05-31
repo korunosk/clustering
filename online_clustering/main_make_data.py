@@ -1,0 +1,32 @@
+import json
+import pandas as pd
+from operator import itemgetter
+
+from modules.preprocessing import Vectorizer
+from config import MAX_NUM_ARTICLES, make_data_path, load_data, dump_data
+
+
+if __name__ == '__main__':
+
+    with open(make_data_path('processed_articles'), mode='r') as fp:
+        processed_articles = [ json.loads(line) for line in fp.readlines() ]
+
+    X1, feature_names1 = Vectorizer.tfidf(map(itemgetter('entities_title'), processed_articles))
+    X2, feature_names2 = Vectorizer.tfidf(map(itemgetter('keyphrases_title'), processed_articles))
+    X3, feature_names3 = Vectorizer.tfidf(map(itemgetter('keyphrases_text'), processed_articles))
+
+    data1 = Vectorizer.make_data(X1, feature_names1)
+    data2 = Vectorizer.make_data(X2, feature_names2)
+    data3 = Vectorizer.make_data(X3, feature_names3)
+
+    dump_data(data1, 'entities_title.json')
+    dump_data(data2, 'keyphrases_title.json')
+    dump_data(data3, 'keyphrases_text.json')
+
+    try:
+        articles = load_data('articles.json')
+        articles = articles[:MAX_NUM_ARTICLES]
+        
+        dump_data(pd.factorize(map(itemgetter('label'), articles)), 'labels_true.json')
+    except:
+        print('No labels')

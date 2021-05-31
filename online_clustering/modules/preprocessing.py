@@ -5,6 +5,8 @@ from itertools import chain
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
+BLACKLIST = set([ 'CARDINAL', 'DATE', 'ORDINAL', 'TIME', 'PERCENT', 'QUANTITY', 'MONEY' ])
+
 nlp = spacy.load('en_core_web_lg')
 
 
@@ -12,7 +14,8 @@ class Preprocessor:
 
     @staticmethod
     def get_entities_spacy(text):
-        return [ ent.text for ent in nlp(text).ents ]
+        in_blacklist = lambda ent: ent.label_ in BLACKLIST
+        return [ ent.text.lower() for ent in nlp(text).ents if not in_blacklist(ent) ]
     
     @staticmethod
     def get_keyphrases_pke(text):
@@ -20,7 +23,7 @@ class Preprocessor:
         extractor.load_document(text, normalization=None)
         extractor.candidate_selection()
         extractor.candidate_weighting()
-        return list(chain.from_iterable([kp] * text.count(kp) for kp, _ in extractor.get_n_best(n=1000)))
+        return list(chain.from_iterable([kp] * text.lower().count(kp) for kp, _ in extractor.get_n_best(n=1000)))
 
 
 class Vectorizer:

@@ -122,6 +122,24 @@ class Clusters:
     
     def get_labels(self):
         return list(map(int, self.__article_distr.values()))
+    
+    def get_parameters(self):
+        map_int = lambda x: list(map(int, x))
+        map_float = lambda x: list(map(float, x))
+
+        vocab = self.__cluster_centers_3.get_vocab()
+        centers = self.__cluster_centers_3.get_centers(self.__n)
+        return {
+            'n': map_int(self.__n),
+            'cluster_distr': list(map(lambda x: (int(x[0]), map_int(x[1])), self.__cluster_distr.items())),
+            'article_distr': list(map(lambda x: (int(x[0]), int(x[1])), self.__article_distr.items())),
+            'cluster_centers_3': {
+                'vocab': list(map(lambda x: (x[0], int(x[1])), vocab.items())),
+                'data': map_float(centers.data),
+                'indices': map_int(centers.indices),
+                'indptr': map_int(centers.indptr),
+            }
+        }
 
     def num_clusters(self):
         return len(self.__n)
@@ -132,7 +150,7 @@ class Clusters:
         self.__cluster_centers_3.resize_horizontaly(article_dict[2])
 
     def resize_verticaly(self):
-        self.__n.resize(self.__n.shape[0] + 1, refcheck=False)
+        self.__n.resize(self.__n.shape[0] + 1)
         self.__cluster_centers_1.resize_verticaly()
         self.__cluster_centers_2.resize_verticaly()
         self.__cluster_centers_3.resize_verticaly()
@@ -154,3 +172,33 @@ class Clusters:
             self.__config['b'] * cosine_similarity(article_repr[1], centers[1]) +
             self.__config['c'] * cosine_similarity(article_repr[2], centers[2])
         )
+
+
+class Executor:
+
+    def __init__(self, config):
+        self.config = config
+        self.clusters = Clusters(config)
+    
+    def new_article(self, article_id, article_dict):
+        self.clusters.resize_horizontaly(article_dict)
+
+        A = Article(article_dict)
+
+        if self.clusters.num_clusters() == 0:
+            self.clusters.resize_verticaly()
+            cluster_id = 0
+            self.clusters.add_article(cluster_id, article_id, A)
+            return
+
+        d = self.clusters.similarity(A)
+
+        d[np.where(d < self.config['thr'])] = np.inf
+
+        if np.all(d == np.inf):
+            self.clusters.resize_verticaly()
+            cluster_id = self.clusters.num_clusters() - 1
+            self.clusters.add_article(cluster_id, article_id, A)
+        else:
+            cluster_id = np.argmin(d)
+            self.clusters.add_article(cluster_id, article_id, A)
