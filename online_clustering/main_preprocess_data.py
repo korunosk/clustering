@@ -8,7 +8,7 @@ from config import MAX_NUM_ARTICLES, make_data_path, load_data
 if __name__ == '__main__':
 
     articles = load_data('articles.json')
-    articles = articles[:MAX_NUM_ARTICLES]
+    # articles = articles[:MAX_NUM_ARTICLES]
 
     with open(make_data_path('processed_articles'), mode='w') as fp:
         for article in tqdm(articles):

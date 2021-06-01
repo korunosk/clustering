@@ -3,7 +3,7 @@ import pandas as pd
 import time
 
 from modules.clustering import Executor
-from config import load_data, dump_res
+from config import load_data, dump_labels
 
 
 if __name__ == '__main__':
@@ -39,4 +39,4 @@ if __name__ == '__main__':
                     fname = f'a={a:.2f} b={b:.2f} c={c:.2f} thr={thr:.2f}'
                     print(f'config=({fname}) #clusters={e.clusters.num_clusters()} et={et:.4f}')
 
-                    dump_res(e.clusters.get_labels(), fname + '.json')
+                    dump_labels(e.clusters.get_labels(), fname + '.json')
