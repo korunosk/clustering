@@ -187,7 +187,7 @@ class Executor:
 
         if self.clusters.num_clusters() == 0:
             self.clusters.resize_verticaly()
-            cluster_id = 0
+            cluster_id = self.clusters.num_clusters() - 1
             self.clusters.add_article(cluster_id, article_id, A)
             return
 
