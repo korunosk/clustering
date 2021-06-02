@@ -27,7 +27,7 @@ class Preprocessor:
         extractor.load_document(text, normalization=None)
         extractor.candidate_selection()
         extractor.candidate_weighting()
-        return list(chain.from_iterable([kp] * text.lower().count(kp) for kp, _ in extractor.get_n_best(n=1000)))
+        return list(chain.from_iterable([kp.lower()] * text.lower().count(kp.lower()) for kp, _ in extractor.get_n_best(n=1000)))
 
 
 class Vectorizer:
@@ -42,7 +42,7 @@ class Vectorizer:
     @staticmethod
     def count(corpus):
         vectorizer = CountVectorizer(tokenizer=lambda doc: doc, preprocessor=lambda doc: doc)
-        X = vectorizer.fit_transform(corpus)
+        X = vectorizer.fit_transform(corpus).astype(float)
         feature_names = np.array(vectorizer.get_feature_names())
         return X, feature_names
 

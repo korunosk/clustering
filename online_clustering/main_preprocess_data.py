@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from tqdm import tqdm
 
 from modules.preprocessing import Preprocessor
@@ -8,7 +9,9 @@ from config import MAX_NUM_ARTICLES, make_data_path, load_data
 if __name__ == '__main__':
 
     articles = load_data('articles.json')
-    # articles = articles[:MAX_NUM_ARTICLES]
+    np.random.seed(42)
+    articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
+    np.random.seed()
 
     with open(make_data_path('processed_articles'), mode='w') as fp:
         for article in tqdm(articles):

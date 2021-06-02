@@ -2,7 +2,7 @@ import json
 import os
 
 
-MAX_NUM_ARTICLES = 10000
+MAX_NUM_ARTICLES = 13822
 
 DATA_DIR      = 'data'
 LABELS_DIR    = 'labels'
