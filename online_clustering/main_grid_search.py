@@ -19,9 +19,9 @@ if __name__ == '__main__':
 
     configs = []
 
-    for a in np.arange(0, 1 + step, step):
+    for c in np.arange(0, 1 + step, step):
         for b in np.arange(0, 1 + step, step):
-            for c in np.arange(0, 1 + step, step):
+            for a in np.arange(0, 1 + step, step):
                 if (a + b + c) != 1:
                     continue
 
@@ -31,12 +31,15 @@ if __name__ == '__main__':
     
     print(f'#configs={len(configs)}')
 
+    configs = configs[:len(configs)//2]
+
     for config in configs:
         a, b, c, thr = config.values()
 
         fname = f'a={a:.2f} b={b:.2f} c={c:.2f} thr={thr:.2f}'
 
         if exist_labels(fname + '.json'):
+            print(f'exists=({fname})')
             continue
 
         st = time.time()
