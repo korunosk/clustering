@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import pandas as pd
 from operator import itemgetter
 
@@ -25,8 +26,14 @@ if __name__ == '__main__':
 
     try:
         articles = load_data('articles.json')
-        articles = articles[:MAX_NUM_ARTICLES]
+        # # Only for LSIR data
+        # np.random.seed(42)
+        # articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
+        # np.random.seed()
 
-        dump_data(pd.factorize(map(itemgetter('label'), articles)), 'labels_true.json')
-    except:
-        print('No labels')
+        labels = list(map(itemgetter('label'), articles))
+        codes, uniques = pd.factorize(labels)
+        codes = codes.tolist()
+        dump_data(codes, 'labels_true.json')
+    except Exception as e:
+        print(e)
