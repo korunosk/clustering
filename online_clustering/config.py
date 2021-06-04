@@ -15,6 +15,9 @@ make_labels_path    = lambda fname: os.path.join(DATA_DIR, DATASET, LABELS_DIR, 
 make_clusters_path  = lambda fname: os.path.join(DATA_DIR, DATASET, CLUSTERS_DIR, fname)
 
 
+def exist_labels(fname):
+    return os.path.exists(make_labels_path(fname))
+
 def load_data(fname):
     with open(make_data_path(fname), mode='r') as fp:
         return json.load(fp)
