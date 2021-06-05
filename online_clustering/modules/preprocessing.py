@@ -24,7 +24,7 @@ class Preprocessor:
         if text is None:
             return []
         extractor = pke.unsupervised.MultipartiteRank()
-        extractor.load_document(text, normalization=None)
+        extractor.load_document(text, normalization=None, spacy_model=nlp)
         extractor.candidate_selection()
         extractor.candidate_weighting()
         return list(chain.from_iterable([kp.lower()] * text.lower().count(kp.lower()) for kp, _ in extractor.get_n_best(n=1000)))
