@@ -193,12 +193,12 @@ class Executor:
 
         d = self.clusters.similarity(A)
 
-        d[np.where(d < self.config['thr'])] = np.inf
+        d[np.where(d < self.config['thr'])] = -np.inf
 
-        if np.all(d == np.inf):
+        if np.all(d == -np.inf):
             self.clusters.resize_verticaly()
             cluster_id = self.clusters.num_clusters() - 1
             self.clusters.add_article(cluster_id, article_id, A)
         else:
-            cluster_id = np.argmin(d)
+            cluster_id = np.argmax(d)
             self.clusters.add_article(cluster_id, article_id, A)
