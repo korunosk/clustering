@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     print(f'#configs={len(configs)}')
 
-    configs = configs[:len(configs)//2]
+    # configs = configs[:len(configs)//2]
 
     for config in configs:
         a, b, c, thr = config.values()
@@ -42,9 +42,9 @@ if __name__ == '__main__':
             print(f'exists=({fname})')
             continue
 
-        st = time.time()
-
         e = Executor(config)
+
+        st = time.time()
 
         for article_id, article_dict in enumerate(data):
             print(f'{article_id + 1} / {len(data)} c={e.clusters.num_clusters()}', end='\r')
