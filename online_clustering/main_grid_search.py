@@ -31,7 +31,6 @@ if __name__ == '__main__':
     
     print(f'#configs={len(configs)}')
 
-    # configs = configs[:len(configs)//2]
 
     for config in configs:
         a, b, c, thr = config.values()
