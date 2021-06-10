@@ -20,11 +20,11 @@ if __name__ == '__main__':
 
     a, b, c, thr = best_params[0].values()
 
-    st = time.time()
-
     config = dict(a=a, b=b, c=c, thr=thr)
 
     e = Executor(config)
+
+    st = time.time()
 
     for article_id, article_dict in enumerate(data):
         print(f'{article_id + 1} / {len(data)} c={e.clusters.num_clusters()}', end='\r')

@@ -1,11 +1,12 @@
 import json
 import os
 
+from config import DATASET
+
 
 DATA_DIR      = 'data'
 LABELS_DIR    = 'labels'
 CLUSTERS_DIR  = 'clusters'
-DATASET       = [ 'news-please', 'lsir' ][0]
 
 
 make_data_path      = lambda fname: os.path.join(DATA_DIR, DATASET, fname)

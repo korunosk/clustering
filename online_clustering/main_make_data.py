@@ -4,7 +4,7 @@ import pandas as pd
 from operator import itemgetter
 
 from modules.preprocessing import Vectorizer
-from config import MAX_NUM_ARTICLES
+from config import DATASET, MAX_NUM_ARTICLES
 from loaders import make_data_path, load_data, dump_data
 
 
@@ -27,10 +27,11 @@ if __name__ == '__main__':
 
     try:
         articles = load_data('articles.json')
-        # # Only for LSIR data
-        # np.random.seed(42)
-        # articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
-        # np.random.seed()
+        
+        if DATASET == 'lsir':   
+            np.random.seed(42)
+            articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
+            np.random.seed()
 
         labels = list(map(itemgetter('label'), articles))
         codes, uniques = pd.factorize(labels)

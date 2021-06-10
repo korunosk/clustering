@@ -3,17 +3,18 @@ import numpy as np
 from tqdm import tqdm
 
 from modules.preprocessing import Preprocessor
-from config import MAX_NUM_ARTICLES
+from config import DATASET, MAX_NUM_ARTICLES
 from loaders import make_data_path, load_data
 
 
 if __name__ == '__main__':
 
     articles = load_data('articles.json')
-    # # Only for LSIR data
-    # np.random.seed(42)
-    # articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
-    # np.random.seed()
+
+    if DATASET == 'lsir':
+        np.random.seed(42)
+        articles = np.random.choice(articles, MAX_NUM_ARTICLES, replace=False).tolist()
+        np.random.seed()
 
     with open(make_data_path('processed_articles'), mode='w') as fp:
         for article in tqdm(articles):
