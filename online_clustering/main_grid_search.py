@@ -3,7 +3,7 @@ import pandas as pd
 import time
 
 from modules.clustering import Executor
-from config import exist_labels, load_data, dump_labels
+from loaders import exist_labels, load_data, dump_labels
 
 
 if __name__ == '__main__':

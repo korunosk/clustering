@@ -4,7 +4,8 @@ import pandas as pd
 from operator import itemgetter
 
 from modules.preprocessing import Vectorizer
-from config import MAX_NUM_ARTICLES, make_data_path, load_data, dump_data
+from config import MAX_NUM_ARTICLES
+from loaders import make_data_path, load_data, dump_data
 
 
 if __name__ == '__main__':

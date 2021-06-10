@@ -3,7 +3,8 @@ import numpy as np
 from tqdm import tqdm
 
 from modules.preprocessing import Preprocessor
-from config import MAX_NUM_ARTICLES, make_data_path, load_data
+from config import MAX_NUM_ARTICLES
+from loaders import make_data_path, load_data
 
 
 if __name__ == '__main__':
