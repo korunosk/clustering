@@ -122,6 +122,12 @@ class Clusters:
     
     def get_labels(self):
         return list(map(int, self.__article_distr.values()))
+
+    def get_n(self):
+        return self.__n
+
+    def get_cluster_distr(self):
+        return self.__cluster_distr
     
     def get_parameters(self):
         map_int = lambda x: list(map(int, x))
