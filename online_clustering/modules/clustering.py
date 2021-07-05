@@ -86,6 +86,23 @@ class ClusterCenters:
 
     def add_article(self, cluster_id, article_repr):
         self.__C[cluster_id] += article_repr[0]
+    
+    def remove_article(self, cluster_id, article_repr):
+        self.__C[cluster_id] -= article_repr[0]
+    
+    def remove_cluster(self, cluster_id):
+        if not isinstance(self.__C, sp.csr_matrix):
+            raise ValueError("works only for CSR format -- use .tocsr() first")
+        n = self.__C.indptr[cluster_id+1] - self.__C.indptr[cluster_id]
+        if n > 0:
+            self.__C.data[self.__C.indptr[cluster_id]:-n] = self.__C.data[self.__C.indptr[cluster_id+1]:]
+            self.__C.data = self.__C.data[:-n]
+            self.__C.indices[self.__C.indptr[cluster_id]:-n] = self.__C.indices[self.__C.indptr[cluster_id+1]:]
+            self.__C.indices = self.__C.indices[:-n]
+        self.__C.indptr[cluster_id:-1] = self.__C.indptr[cluster_id+1:]
+        self.__C.indptr[cluster_id:] -= n
+        self.__C.indptr = self.__C.indptr[:-1]
+        self.__C._shape = (self.__C._shape[0]-1, self.__C._shape[1])
 
 
 class Clusters:
@@ -98,6 +115,7 @@ class Clusters:
         self.__n = np.empty(0, dtype=int)
         self.__cluster_distr = defaultdict(list)
         self.__article_distr = OrderedDict()
+        self.__articles = OrderedDict()
 
     def get_vocab(self):
         return (
@@ -150,26 +168,57 @@ class Clusters:
         self.__cluster_centers_3.resize_horizontaly(article_dict[2])
 
     def resize_verticaly(self):
-        self.__n.resize(self.__n.shape[0] + 1)
+        self.__n.resize(self.__n.shape[0] + 1, refcheck=False)
         self.__cluster_centers_1.resize_verticaly()
         self.__cluster_centers_2.resize_verticaly()
         self.__cluster_centers_3.resize_verticaly()
 
     def add_article(self, cluster_id, article_id, article):
-        self.__n[cluster_id] += 1
-        self.__cluster_distr[cluster_id].append(article_id)
-        self.__article_distr[article_id] = cluster_id
         article_repr = article.get_article_repr(self.get_vocab())
         self.__cluster_centers_1.add_article(cluster_id, article_repr[0])
         self.__cluster_centers_2.add_article(cluster_id, article_repr[1])
         self.__cluster_centers_3.add_article(cluster_id, article_repr[2])
+        self.__n[cluster_id] += 1
+        self.__cluster_distr[cluster_id].append(article_id)
+        self.__article_distr[article_id] = cluster_id
+        self.__articles[article_id] = article
+    
+    def remove_article(self, article_id):
+        cluster_id = self.__article_distr[article_id]
+        article = self.__articles[article_id]
+        article_repr = article.get_article_repr(self.get_vocab())
+
+        del self.__articles[article_id]
+        del self.__article_distr[article_id]
+        self.__cluster_distr[cluster_id].remove(article_id)
+        self.__n[cluster_id] -= 1
+        
+        if self.__n[cluster_id] == 0:
+            self.__cluster_centers_1.remove_cluster(cluster_id)
+            self.__cluster_centers_2.remove_cluster(cluster_id)
+            self.__cluster_centers_3.remove_cluster(cluster_id)
+
+            self.__n = np.delete(self.__n, cluster_id)
+            del self.__cluster_distr[cluster_id]
+
+            items = list(self.__cluster_distr.items())
+            for c_id, article_ids in items:
+                if c_id > cluster_id:
+                    del self.__cluster_distr[c_id]
+                    self.__cluster_distr[c_id-1] = article_ids
+                    for article_id in article_ids:
+                        self.__article_distr[article_id] -= 1
+        else:
+            self.__cluster_centers_1.remove_article(cluster_id, article_repr[0])
+            self.__cluster_centers_2.remove_article(cluster_id, article_repr[1])
+            self.__cluster_centers_3.remove_article(cluster_id, article_repr[2])
     
     def similarity(self, article):
         article_repr = article.get_article_repr(self.get_vocab())
         centers = self.get_centers()
         return (
             self.__config['a'] * jaccard_similarity(article_repr[0], centers[0]) +
-            self.__config['b'] * cosine_similarity(article_repr[1], centers[1]) +
+            self.__config['b'] * jaccard_similarity(article_repr[1], centers[1]) +
             self.__config['c'] * cosine_similarity(article_repr[2], centers[2])
         )
 
@@ -179,8 +228,15 @@ class Executor:
     def __init__(self, config):
         self.config = config
         self.clusters = Clusters(config)
+        self.window = []
     
     def new_article(self, article_id, article_dict):
+        self.window.append(article_id)
+
+        if len(self.window) > 1000:
+            self.clusters.remove_article(self.window[0])
+            self.window = self.window[1:]
+
         self.clusters.resize_horizontaly(article_dict)
 
         A = Article(article_dict)
